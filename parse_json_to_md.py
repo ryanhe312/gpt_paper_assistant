@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import re
 
+link_prefix = 'user-content-'
 
 def render_paper(paper_entry: dict, idx: int) -> str:
     """
@@ -15,12 +16,13 @@ def render_paper(paper_entry: dict, idx: int) -> str:
     title = paper_entry["title"]
     # get the arxiv url
     arxiv_url = f"https://arxiv.org/abs/{arxiv_id}"
+    arxiv_pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
     # get the abstract
     abstract = paper_entry["abstract"]
     # get the authors
     authors = paper_entry["authors"]
     paper_string = f'### {idx}. [{title}]({arxiv_url})\n'
-    paper_string += f"**ArXiv:** {arxiv_id}\n"
+    paper_string += f"**ArXiv:** {arxiv_id} [[page]({arxiv_url})] [[pdf]({arxiv_pdf_url})]\n\n"
     paper_string += f'**Authors:** {", ".join(authors)}\n\n'
     paper_string += f"**Abstract:** {abstract}\n\n"
     if "COMMENT" in paper_entry:
@@ -32,7 +34,7 @@ def render_paper(paper_entry: dict, idx: int) -> str:
         novelty = paper_entry["NOVELTY"]
         paper_string += f"**Relevance:** {relevance}\n"
         paper_string += f"**Novelty:** {novelty}\n"
-    paper_string += f"[back to top](#topics)\n"
+    paper_string += f"[back to top](#{link_prefix}topics)\n"
     return paper_string
 
 
@@ -51,7 +53,7 @@ def render_title_and_author(paper_entry: dict, idx: int) -> str:
     
     # Replace spaces with dashes
     cleaned = cleaned.replace(' ', '-').lower()
-    paper_string = f'{idx}. [{title}]({arxiv_url}) [[More](#{cleaned})] \\\n'
+    paper_string = f'{idx}. [{title}]({arxiv_url}) [[More](#{link_prefix}{cleaned})] \\\n'
     paper_string += f'**Authors:** {", ".join(authors)}\n'
     return paper_string
 
@@ -60,8 +62,8 @@ def render_criteria(criteria: list[str]) -> str:
     criteria_string = ""
     for criterion in criteria:
         topic_idx = int(criterion.split('.')[0])
-        criteria_string += f"[{criterion}](#topic-{topic_idx})\n\n"
-    criteria_string += '[Go beyond](#go-beyond)\n\n'
+        criteria_string += f"[{criterion}](#{link_prefix}topic-{topic_idx})\n\n"
+    criteria_string += f'[Go beyond](#{link_prefix}go-beyond)\n\n'
     return criteria_string
 
 def extract_criterion_from_paper(paper_entry: dict) -> int:
@@ -79,7 +81,7 @@ def extract_criterion_from_paper(paper_entry: dict) -> int:
         return 0 # not sure
 
 def render_md_paper_title_by_topic(topic, paper_in_topic: list[str]) -> str: 
-    return f"### {topic}\n[back to top](#topics)\n\n" +  "\n".join(paper_in_topic) + "\n---\n"
+    return f"### {topic}\n" +  "\n".join(paper_in_topic) + f"\n\n[back to top](#{link_prefix}topics)\n\n---\n"
         
 
 def render_md_string(papers_dict):
@@ -94,6 +96,7 @@ def render_md_string(papers_dict):
     output_string = (
         "# Personalized Daily Arxiv Papers "
         + datetime.today().strftime("%m/%d/%Y")
+        + "\n\nThis project is adapted from [tatsu-lab/gpt_paper_assistant](https://github.com/tatsu-lab/gpt_paper_assistant). About me on [Bilibili](https://space.bilibili.com/823532)."
         + "\n\n## Topics\n\nPaper selection prompt and criteria (jump to the section by clicking the link):\n\n"
         + criteria_string
         + "\n---\n"
@@ -110,26 +113,31 @@ def render_md_string(papers_dict):
     # output_string = output_string + "\n".join(title_strings) + "\n---\n"
     '''
     # render each topic
-    paper_str_group_by_topic = [[] for _ in range(len(filtered_criteria) + 1)]
+    paper_title_group_by_topic = [[] for _ in range(len(filtered_criteria) + 1)]
+    paper_full_group_by_topic = [[] for _ in range(len(filtered_criteria) + 1)]
     for i, paper in enumerate(papers_dict.values()):
         paper_topic_idx = extract_criterion_from_paper(paper)
         title_string = render_title_and_author(paper, i)
-        paper_str_group_by_topic[paper_topic_idx].append(title_string)
+        paper_title_group_by_topic[paper_topic_idx].append(title_string)
+        full_string = render_paper(paper, i)
+        paper_full_group_by_topic[paper_topic_idx].append(full_string)
         
-    for topic_idx, paper_in_topic in enumerate(paper_str_group_by_topic):
+    for topic_idx, paper_in_topic in enumerate(paper_title_group_by_topic):
         if topic_idx == 0:
             # unknown topic
             continue
         output_string += render_md_paper_title_by_topic(f'Topic {topic_idx}', paper_in_topic) 
-    output_string += render_md_paper_title_by_topic("Go beyond", paper_str_group_by_topic[0])
+    output_string += render_md_paper_title_by_topic("Go beyond", paper_title_group_by_topic[0])
 
+    """
     # render each paper
     paper_strings = [
         render_paper(paper, i) for i, paper in enumerate(papers_dict.values())
     ]
+    """
+    paper_string = "\n---\n".join(["\n".join(paper_in_topic) for paper_in_topic in paper_full_group_by_topic[1:] + paper_full_group_by_topic[:1]])
     # join all papers into one string
-    output_string += "## Full paper list\n"
-    output_string = output_string + "\n".join(paper_strings)
+    output_string += f"## Full paper list\n {paper_string}"
     # output_string += "\n\n---\n\n"
     # output_string += f"## Paper selection prompt\n{criterion}"
     return output_string
