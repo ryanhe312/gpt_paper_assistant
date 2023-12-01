@@ -18,13 +18,13 @@ def render_paper(paper_entry: dict, idx: int) -> str:
     abstract = paper_entry["abstract"]
     # get the authors
     authors = paper_entry["authors"]
-    paper_string = f'## {idx}. [{title}]({arxiv_url}) <a id="link{idx}"></a>\n'
-    paper_string += f"**ArXiv ID:** {arxiv_id}\n"
+    paper_string = f'## {idx}. [{title}]({arxiv_url})\n'
+    paper_string += f"**ArXiv:** {arxiv_id}\n"
     paper_string += f'**Authors:** {", ".join(authors)}\n\n'
     paper_string += f"**Abstract:** {abstract}\n\n"
     if "COMMENT" in paper_entry:
         comment = paper_entry["COMMENT"]
-        paper_string += f"**Comment:** {comment}\n"
+        paper_string += f"**Comment:** {comment}\n\n"
     if "RELEVANCE" in paper_entry and "NOVELTY" in paper_entry:
         # get the relevance and novelty scores
         relevance = paper_entry["RELEVANCE"]
@@ -35,9 +35,14 @@ def render_paper(paper_entry: dict, idx: int) -> str:
 
 
 def render_title_and_author(paper_entry: dict, idx: int) -> str:
+    # get the arxiv id
+    arxiv_id = paper_entry["arxiv_id"]
+    # get the title
     title = paper_entry["title"]
+    # get the arxiv url
+    arxiv_url = f"https://arxiv.org/abs/{arxiv_id}"
     authors = paper_entry["authors"]
-    paper_string = f"{idx}. [{title}](#link{idx})\n"
+    paper_string = f'{idx}. [{title}]({arxiv_url}) \\\n'
     paper_string += f'**Authors:** {", ".join(authors)}\n'
     return paper_string
 
