@@ -3,6 +3,7 @@ from datetime import datetime
 import re
 
 link_prefix = 'user-content-'
+topic_shift = 1000
 
 def render_paper(paper_entry: dict, idx: int) -> str:
     """
@@ -21,7 +22,7 @@ def render_paper(paper_entry: dict, idx: int) -> str:
     abstract = paper_entry["abstract"]
     # get the authors
     authors = paper_entry["authors"]
-    paper_string = f'### {idx}. [{title}]({arxiv_url})\n'
+    paper_string = f'### {idx}\. [{title}]({arxiv_url})\n'
     paper_string += f"**ArXiv:** {arxiv_id} [[page]({arxiv_url})] [[pdf]({arxiv_pdf_url})]\n\n"
     paper_string += f'**Authors:** {", ".join(authors)}\n\n'
     paper_string += f"**Abstract:** {abstract}\n\n"
@@ -34,7 +35,9 @@ def render_paper(paper_entry: dict, idx: int) -> str:
         novelty = paper_entry["NOVELTY"]
         paper_string += f"**Relevance:** {relevance}\n"
         paper_string += f"**Novelty:** {novelty}\n"
-    paper_string += f"[back to top](#{link_prefix}topics)\n"
+    topic_id = idx // topic_shift 
+    topic_str = f'topic-{topic_id}' if topic_id else 'go-beyond'
+    paper_string += f"Back to [[topic](#{link_prefix}{topic_str})] [[top](#{link_prefix}topics)]\n"
     return paper_string
 
 
@@ -53,7 +56,7 @@ def render_title_and_author(paper_entry: dict, idx: int) -> str:
     
     # Replace spaces with dashes
     cleaned = cleaned.replace(' ', '-').lower()
-    paper_string = f'{idx}. [{title}]({arxiv_url}) [[More](#{link_prefix}{cleaned})] \\\n'
+    paper_string = f'{idx}\. [{title}]({arxiv_url}) [[more](#{link_prefix}{cleaned})] \\\n'
     paper_string += f'**Authors:** {", ".join(authors)}\n'
     return paper_string
 
@@ -81,7 +84,7 @@ def extract_criterion_from_paper(paper_entry: dict) -> int:
         return 0 # not sure
 
 def render_md_paper_title_by_topic(topic, paper_in_topic: list[str]) -> str: 
-    return f"### {topic}\n" +  "\n".join(paper_in_topic) + f"\n\n[back to top](#{link_prefix}topics)\n\n---\n"
+    return f"### {topic}\n" +  "\n".join(paper_in_topic) + f"\n\nBack to [[top](#{link_prefix}topics)]\n\n---\n"
         
 
 def render_md_string(papers_dict):
@@ -117,9 +120,9 @@ def render_md_string(papers_dict):
     paper_full_group_by_topic = [[] for _ in range(len(filtered_criteria) + 1)]
     for i, paper in enumerate(papers_dict.values()):
         paper_topic_idx = extract_criterion_from_paper(paper)
-        title_string = render_title_and_author(paper, i)
+        title_string = render_title_and_author(paper, i + paper_topic_idx * topic_shift)
         paper_title_group_by_topic[paper_topic_idx].append(title_string)
-        full_string = render_paper(paper, i)
+        full_string = render_paper(paper, i + paper_topic_idx * topic_shift)
         paper_full_group_by_topic[paper_topic_idx].append(full_string)
         
     for topic_idx, paper_in_topic in enumerate(paper_title_group_by_topic):
@@ -135,7 +138,7 @@ def render_md_string(papers_dict):
         render_paper(paper, i) for i, paper in enumerate(papers_dict.values())
     ]
     """
-    paper_string = "\n---\n".join(["\n".join(paper_in_topic) for paper_in_topic in paper_full_group_by_topic[1:] + paper_full_group_by_topic[:1]])
+    paper_string = "\n---\n".join(["\n".join(paper_in_topic) for paper_in_topic in paper_full_group_by_topic[1:] + paper_full_group_by_topic[:1] if len(paper_in_topic)])
     # join all papers into one string
     output_string += f"## Full paper list\n {paper_string}"
     # output_string += "\n\n---\n\n"

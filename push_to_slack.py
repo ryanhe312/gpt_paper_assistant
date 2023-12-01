@@ -10,7 +10,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 from arxiv_scraper import Paper
-from parse_json_to_md import extract_criterion_from_paper
+from parse_json_to_md import extract_criterion_from_paper, topic_shift
 
 T = TypeVar("T")
 
@@ -203,15 +203,17 @@ def push_to_slack(papers_dict):
     # render each paper
     if len(papers_dict) == 0:
         return
+    topic_ids = [
+        extract_criterion_from_paper(paper) for paper in papers_dict.values()
+    ]
+    
     title_strings = [
-        render_title(paper, i) for i, paper in enumerate(papers_dict.values())
+        render_title(paper, i + topic_shift * topic_ids[i]) for i, paper in enumerate(papers_dict.values())
     ]
     paper_strings = [
-        render_paper(paper, i) for i, paper in enumerate(papers_dict.values())
+        render_paper(paper, i + topic_shift * topic_ids[i]) for i, paper in enumerate(papers_dict.values())
     ]
-    topic_ids = [
-        extract_criterion_from_paper(paper) for i, paper in enumerate(papers_dict.values())
-    ]
+    
     
     blocks, thread_blocks = build_block_list(title_strings, paper_strings, topic_ids)
     # push to slack
