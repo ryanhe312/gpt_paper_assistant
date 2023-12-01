@@ -19,7 +19,7 @@ def render_paper(paper_entry: dict, idx: int) -> str:
     abstract = paper_entry["abstract"]
     # get the authors
     authors = paper_entry["authors"]
-    paper_string = f'## {idx}. [{title}]({arxiv_url})\n'
+    paper_string = f'### {idx}. [{title}]({arxiv_url})\n'
     paper_string += f"**ArXiv:** {arxiv_id}\n"
     paper_string += f'**Authors:** {", ".join(authors)}\n\n'
     paper_string += f"**Abstract:** {abstract}\n\n"
@@ -33,7 +33,7 @@ def render_paper(paper_entry: dict, idx: int) -> str:
         paper_string += f"**Relevance:** {relevance}\n"
         paper_string += f"**Novelty:** {novelty}\n"
     paper_string += f"[back to top](#topics)\n"
-    return paper_string + "\n---\n"
+    return paper_string
 
 
 def render_title_and_author(paper_entry: dict, idx: int) -> str:
@@ -56,46 +56,46 @@ def render_title_and_author(paper_entry: dict, idx: int) -> str:
     return paper_string
 
 
-def render_criterion(criterions: list[str]) -> str:
-    criterion_string = ""
-    for criteria in criterions:
-        topic_idx = int(criteria.split('.')[0])
-        criterion_string += f"[{criteria}](#topic-{topic_idx})\n\n"
-    criterion_string += '[Unknown](#topic-unknown)\n\n'
-    return criterion_string
+def render_criteria(criteria: list[str]) -> str:
+    criteria_string = ""
+    for criterion in criteria:
+        topic_idx = int(criterion.split('.')[0])
+        criteria_string += f"[{criterion}](#topic-{topic_idx})\n\n"
+    criteria_string += '[Go beyond](#go-beyond)\n\n'
+    return criteria_string
 
 def extract_criterion_from_paper(paper_entry: dict) -> int:
     if "COMMENT" not in paper_entry:
         return 0
     # Regular expression pattern to find 'criterion' followed by a number
-    pattern = r'criterion (\d+)'
+    pattern = r'riteri(.+) (\d+)'
     # Search for the pattern in the text
     match = re.search(pattern, paper_entry["COMMENT"])
     if match:
         # Extract the number (group 1 in the match)
-        criterion_number = match.group(1)
+        criterion_number = match.group(2)
         return int(criterion_number)
     else:
         return 0 # not sure
 
-def render_md_paper_title_by_topic(topic_idx, paper_in_topic: list[str]) -> str: 
-    return f"### Topic {topic_idx}\n[back to top](#topics)\n\n" +  "\n".join(paper_in_topic) + "\n---\n"
+def render_md_paper_title_by_topic(topic, paper_in_topic: list[str]) -> str: 
+    return f"### {topic}\n[back to top](#topics)\n\n" +  "\n".join(paper_in_topic) + "\n---\n"
         
 
 def render_md_string(papers_dict):
     # header
     with open("configs/paper_topics.txt", "r") as f:
-        criterion = f.readlines()
+        criteria = f.readlines()
         
-    filtered_criterion = [i for i in criterion if len(i.strip()) and i.strip()[0] in '0123456789']
+    filtered_criteria = [i for i in criteria if len(i.strip()) and i.strip()[0] in '0123456789']
     
-    criterion_string = render_criterion(filtered_criterion)
+    criteria_string = render_criteria(filtered_criteria)
         
     output_string = (
         "# Personalized Daily Arxiv Papers "
         + datetime.today().strftime("%m/%d/%Y")
         + "\n\n## Topics\n\nPaper selection prompt and criteria (jump to the section by clicking the link):\n\n"
-        + criterion_string
+        + criteria_string
         + "\n---\n"
         # + "## All\n Total relevant papers: "
         # + str(len(papers_dict))
@@ -110,7 +110,7 @@ def render_md_string(papers_dict):
     # output_string = output_string + "\n".join(title_strings) + "\n---\n"
     '''
     # render each topic
-    paper_str_group_by_topic = [[] for _ in range(len(filtered_criterion) + 1)]
+    paper_str_group_by_topic = [[] for _ in range(len(filtered_criteria) + 1)]
     for i, paper in enumerate(papers_dict.values()):
         paper_topic_idx = extract_criterion_from_paper(paper)
         title_string = render_title_and_author(paper, i)
@@ -120,8 +120,8 @@ def render_md_string(papers_dict):
         if topic_idx == 0:
             # unknown topic
             continue
-        output_string += render_md_paper_title_by_topic(topic_idx, paper_in_topic) 
-    output_string += render_md_paper_title_by_topic("unknown", paper_str_group_by_topic[0])
+        output_string += render_md_paper_title_by_topic(f'Topic {topic_idx}', paper_in_topic) 
+    output_string += render_md_paper_title_by_topic("Go beyond", paper_str_group_by_topic[0])
 
     # render each paper
     paper_strings = [

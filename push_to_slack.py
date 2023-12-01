@@ -182,11 +182,11 @@ def build_block_list(title_strings, paper_strings, topic_ids):
         covered_topic.add(topic)
     
     with open("configs/paper_topics.txt", "r") as f:
-        criterion = f.readlines()
-    filtered_criterion = [i for i in criterion if len(i.strip()) and i.strip()[0] in '0123456789']
-    
-    
-    thread_blocks = [[render_topic_block(i)] for i in filtered_criterion]
+        criteria = f.readlines()
+        
+    filtered_criteria = [i for i in criteria if len(i.strip()) and i.strip()[0] in '0123456789']
+
+    thread_blocks = [[render_topic_block(i)] for i in filtered_criteria]
     thread_blocks.insert(0, [render_topic_block("GPT thinks you may like:")])
     for topic, paper in zip(topic_ids, paper_strings):
         thread_blocks[topic].append(
