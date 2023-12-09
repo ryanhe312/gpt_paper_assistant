@@ -73,7 +73,7 @@ def extract_criterion_from_paper(paper_entry: dict) -> int:
     if "COMMENT" not in paper_entry:
         return 0
     # Regular expression pattern to find 'criterion' followed by a number
-    pattern = r'riteri(.+) (\d+)'
+    pattern = r'riteri(.+?) (\d+)'
     # Search for the pattern in the text
     match = re.search(pattern, paper_entry["COMMENT"])
     if match:
