@@ -188,6 +188,7 @@ def run_on_batch(
         ]
     )
     json_dicts, cost = run_and_parse_chatgpt(full_prompt, openai_client, config)
+    if cost is None: cost = 0
     return json_dicts, cost
 
 
