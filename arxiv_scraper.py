@@ -83,20 +83,30 @@ def get_papers_from_arxiv_rss(area: str, config: Optional[dict]) -> Tuple[List[P
         return [], None, None
     # get the list of entries
     entries = feed.entries
-    timestamp = datetime.strptime(
-        feed.headers["last-modified"], "%a, %d %b %Y %H:%M:%S GMT"
-    )
+    try:
+        timestamp = datetime.strptime(
+            feed.headers["last-modified"], "%a, %d %b %Y %H:%M:%S GMT"
+        )
+    except KeyError:
+        timestamp = datetime.strptime(
+            feed.headers["date"], "%a, %d %b %Y %H:%M:%S GMT"
+        )
+    if len(feed.entries) == 0:
+        return [], None, None
     # ugly hack: this should be the very oldest paper in the RSS feed that was not put on hold.
     # if ArXiv changes their RSS announcement format this line will break, but we have no other way of getting this info
-    last_id = feed.entries[0].id.split("/")[-1]
+    match = re.search(r'(\d+\.\d+)', feed.entries[0].id)
+    last_id = match.group(0) if match else None
+    if last_id is None:
+        return [], None, None
     paper_list = []
     for paper in entries:
         # ignore updated papers
         if ("UPDATED" in paper.title) or ("CROSS LISTED" in paper.title):
             continue
         # extract area
-        paper_area = re.findall("\[.*\]", paper.title)[0]
-        if (f'[{area}]' != paper_area) and (config["FILTERING"].getboolean("force_primary")):
+        # paper_area = re.findall("\[.*\]", paper.title)[0]
+        if (area != paper['tags'][0]['term']) and (config["FILTERING"].getboolean("force_primary")):
             continue
         # otherwise make a new paper, for the author field make sure to strip the HTML tags
         authors = [
