@@ -55,11 +55,11 @@ def filter_papers_by_hindex(all_authors, papers, config):
 
 
 def calc_price(model, usage):
-    if model == "gpt-4-1106-preview":
+    if model in ["gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4-turbo-preview"]:
         return (0.01 * usage.prompt_tokens + 0.03 * usage.completion_tokens) / 1000.0
     if model == "gpt-4":
         return (0.03 * usage.prompt_tokens + 0.06 * usage.completion_tokens) / 1000.0
-    if (model == "gpt-3.5-turbo") or (model == "gpt-3.5-turbo-1106"):
+    if model.startswith("gpt-3.5-turbo"):
         return (0.0015 * usage.prompt_tokens + 0.002 * usage.completion_tokens) / 1000.0
 
 
@@ -155,8 +155,8 @@ def filter_papers_by_title(
         full_prompt = (
             base_prompt + "\n " + criterion + "\n" + papers_string + filter_postfix
         )
-        completion = call_chatgpt(full_prompt, "gpt-4")
-        cost = calc_price("gpt-4", completion.usage)
+        completion = call_chatgpt(full_prompt, config["SELECTION"]["model"])
+        cost = calc_price(config["SELECTION"]["model"], completion.usage)
         out_text = completion.choices[0].message.content
         try:
             filtered_set = set(json.loads(out_text))

@@ -88,6 +88,7 @@ def get_papers_from_arxiv_rss(area: str, config: Optional[dict]) -> Tuple[List[P
             feed.headers["last-modified"], "%a, %d %b %Y %H:%M:%S GMT"
         )
     except KeyError:
+        print('last-modified not found in the key, use data instead')
         timestamp = datetime.strptime(
             feed.headers["date"], "%a, %d %b %Y %H:%M:%S GMT"
         )
