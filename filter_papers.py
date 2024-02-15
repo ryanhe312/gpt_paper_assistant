@@ -184,6 +184,9 @@ def filter_by_gpt(
     if config["SELECTION"].getboolean("run_openai"):
         # filter first by hindex of authors to reduce costs.
         paper_list = filter_papers_by_hindex(all_authors, papers, config)
+        if len(paper_list) < 5:
+            print(f'Only {len(paper_list)} papers left, something might be wrong with the hindex filtering, use all papers instead.')
+            paper_list = papers[:]
         if config["OUTPUT"].getboolean("debug_messages"):
             print(str(len(paper_list)) + " papers after hindex filtering")
         paper_list, cost = filter_papers_by_title(
