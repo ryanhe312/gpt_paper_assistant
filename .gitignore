@@ -5,3 +5,6 @@ configs/keys.ini
 # dont commit venv and ide stuff
 venv
 .idea
+*.sh
+.vscode/
+__pycache__/

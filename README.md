@@ -32,6 +32,9 @@ At this point your bot should run daily and publish a static website. You can te
 8. Take a look at `configs/config.ini` to tweak how things are filtered.
 9. Set the github repo private to avoid github actions being [set to inactive after 60 days](https://docs.github.com/en/actions/using-workflows/disabling-and-enabling-a-workflow)
 
+10. **Set up a google chat bot** create a chat space and get the `WEB_HOOK` from `Space setting -> App & integrations -> Webhooks`, set it to `WEB_HOOK` as a github secret
+11. Take a look at `configs/config.ini` to enable `push_to_google`.
+
 Each day at 1pm UTC, the bot will run and post to slack and publish a github pages website (see the publish_md and cron_runs actions for details).
 
 ### Running locally
