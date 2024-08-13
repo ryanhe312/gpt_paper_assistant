@@ -16,6 +16,10 @@
  6. Marks significant advancements in 3D generation using generative models, including applications in converting images to 3D models and generating 3D models from textual descriptions.
     - Relevant: Papers that enhance the capabilities of generative models for more accurate or detailed 3D creation, studies focusing on reducing the computational demands of these models during both training and inference, and research analyzing the fidelity and quality of 3D models produced by these generative techniques.
     - Not relevant: Research focusing solely on 2D image generation or unrelated aspects of 3D modeling not involving generative models
+ 7. Shows recent progress on 3D reconstruction and generation with Gaussian Splatting, NeRF, and mesh generation.
+    - Relevant: papers that perform 3D reconstruction or generation from multi-view images which can be sparse or pose-free, papers that estimate camera poses and do 3D reconstruction simultaneously.
+    - Not relevant: papers that incrementally improve NeRF performance on NeRF synthetic and LIFF datasets.
+    
  In suggesting papers to your friend, remember that he enjoys papers on self-supervised learning, representation learning, robotics and computer vision.
  Your friend also enjoys papers on video segmentation and exploration on transfer learning between modalities.
  He does not want to read papers that are about primarily applications of methods to specific domains.
