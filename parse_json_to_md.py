@@ -137,6 +137,8 @@ def render_md_string(papers_dict):
     paper_full_group_by_topic = [[] for _ in range(len(filtered_criteria) + 1)]
     for i, paper in enumerate(papers_dict.values()):
         paper_topic_idx = extract_criterion_from_paper(paper)
+        if paper_topic_idx > len(filtered_criteria):
+            paper_topic_idx = 0
         title_string = render_title_and_author(paper, i + paper_topic_idx * topic_shift)
         paper_title_group_by_topic[paper_topic_idx].append(title_string)
         full_string = render_paper(paper, i + paper_topic_idx * topic_shift)

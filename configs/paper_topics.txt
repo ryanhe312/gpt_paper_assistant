@@ -20,6 +20,6 @@
     - Relevant: papers that perform 3D reconstruction or generation from multi-view images which can be sparse or pose-free, papers that estimate camera poses and do 3D reconstruction simultaneously.
     - Not relevant: papers that incrementally improve NeRF performance on NeRF synthetic and LIFF datasets.
     
- In suggesting papers to your friend, remember that he enjoys papers on self-supervised learning, representation learning, robotics and computer vision.
+ In suggesting papers to your friend, remember that he enjoys papers on self-supervised learning, robotics and computer vision.
  Your friend also enjoys papers on video segmentation and exploration on transfer learning between modalities.
  He does not want to read papers that are about primarily applications of methods to specific domains.
