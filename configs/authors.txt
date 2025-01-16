@@ -1,5 +1,8 @@
-# Some robotics people.
-Peter R. Florence, 47686265
-Andy Zeng, 38591293
-Shuran Song, 3340170
-Weidi Xie, 10096695
+# Some CV and ML people.
+I. Sutskever, 1701686
+Ashish Vaswani, 40348417
+Lvmin-Zhang, 17744884
+Kaiming He, 39353098
+Yann LeCun, 1688882
+Geoffrey E. Hinton, 1695689
+Yoshua Bengio, 1751762
