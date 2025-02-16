@@ -41,10 +41,10 @@ jobs:
        token: ${{ secrets.GITHUB_TOKEN }}
        file: output.md
        title: Arxiv Daily
-    - uses: actions/upload-pages-artifact@v2
+    - uses: actions/upload-pages-artifact@v3
       if: steps.check_files.outputs.files_exists == 'true'
       with:
         path: dist
-    - uses: actions/deploy-pages@v1
+    - uses: actions/deploy-pages@v4
       if: steps.check_files.outputs.files_exists == 'true'
       id: deployment
